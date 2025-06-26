@@ -1,0 +1,30 @@
+{
+  "name": "special-fortnight",
+  "version": "1.0.0",
+  "description": "e-wallet",
+  "keywords": [
+    "e-wallet",
+    "bank",
+    "student",
+    "save",
+    "savings",
+    "machine",
+    "machine-learning",
+    "machinelearning"
+  ],
+  "homepage": "https://github.com/PeaceOloruntoba/special-fortnight#readme",
+  "bugs": {
+    "url": "https://github.com/PeaceOloruntoba/special-fortnight/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeaceOloruntoba/special-fortnight.git"
+  },
+  "license": "ISC",
+  "author": "PeaceOloruntoba",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
