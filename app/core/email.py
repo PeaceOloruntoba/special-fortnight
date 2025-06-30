@@ -1,4 +1,3 @@
-# app/core/email.py
 import httpx
 from app.config import settings
 from fastapi import HTTPException, status
