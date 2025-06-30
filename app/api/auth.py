@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorClient
-from app.core.deps import get_db_client
+from app.core.deps import get_current_active_user, get_db_client
 from app.core.security import get_password_hash, create_access_token, verify_password
-from app.crud.user import create_user, get_user_by_email
+from app.crud.user import create_user, get_user_by_email, get_user_by_student_id
 from app.models.user import UserCreate, UserInDB, UserResponse
 from app.schemas.auth import Token
 from datetime import timedelta
