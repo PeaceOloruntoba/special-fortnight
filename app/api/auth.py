@@ -30,10 +30,10 @@ def get_frontend_base_url(request: Request) -> str:
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register_user(
-    user_data: UserCreate,
-    db_client: AsyncIOMotorClient = Depends(get_db_client),
-    background_tasks: BackgroundTasks,
-    request: Request
+    user_data: UserCreate, # Non-default argument
+    background_tasks: BackgroundTasks, # Non-default argument
+    request: Request, # Non-default argument
+    db_client: AsyncIOMotorClient = Depends(get_db_client) # Default argument (must come last)
 ):
     """
     Registers a new user. Sends a verification email.
@@ -124,10 +124,10 @@ async def login_for_access_token(
 
 @router.post("/forgot-password", status_code=status.HTTP_200_OK, summary="Request Password Reset")
 async def forgot_password(
-    request_data: ForgotPasswordRequest,
-    db_client: AsyncIOMotorClient = Depends(get_db_client),
-    background_tasks: BackgroundTasks,
-    request: Request
+    request_data: ForgotPasswordRequest, # Non-default argument
+    background_tasks: BackgroundTasks, # Non-default argument
+    request: Request,                  # Non-default argument
+    db_client: AsyncIOMotorClient = Depends(get_db_client) # Default argument (must come last)
 ):
     """
     Initiates the password reset process. Sends a reset link to the user's email.
@@ -191,3 +191,4 @@ async def read_users_me(current_user: UserResponse = Depends(get_current_active_
     Retrieves details of the currently authenticated active user.
     """
     return current_user
+ 
