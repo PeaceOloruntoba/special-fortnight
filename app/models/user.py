@@ -1,7 +1,8 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Any, Optional
 from datetime import datetime
-from bson import ObjectId # For handling MongoDB's _id
+from bson import ObjectId
+from pydantic_core import CoreSchema, PydanticCustomType  # For handling MongoDB's _id
 
 class PyObjectId(ObjectId):
     @classmethod
@@ -14,9 +15,19 @@ class PyObjectId(ObjectId):
             raise ValueError("Invalid objectid")
         return ObjectId(v)
 
+    # --- START OF PYDANTIC V2 CHANGE ---
     @classmethod
-    def __modify_schema__(cls, field_schema: dict):
-        field_schema.update(type="string")
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: Any
+    ) -> CoreSchema:
+        return PydanticCustomType.new_schema(
+            cls.validate, # The validator function
+            json_schema={
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{24}$", # Optional: add a pattern for ObjectID format
+            },
+        )
+    # --- END OF PYDANTIC V2 CHANGE ---
 
 class UserBase(BaseModel):
     firstname: str
@@ -29,9 +40,9 @@ class UserBase(BaseModel):
     registered_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
-        populate_by_name = True # Allow mapping by alias
-        json_encoders = {ObjectId: str} # Convert ObjectId to string for JSON output
-        arbitrary_types_allowed = True # Allow custom types like PyObjectId
+        populate_by_name = True
+        json_encoders = {ObjectId: str}
+        arbitrary_types_allowed = True
 
 class UserCreate(UserBase):
     password: str
@@ -42,4 +53,9 @@ class UserInDB(UserBase):
     hashed_password: str
 
 class UserResponse(UserBase):
+    id: PyObjectId = Field(alias="_id")
+    
+    
+
+
     id: PyObjectId = Field(alias="_id")
