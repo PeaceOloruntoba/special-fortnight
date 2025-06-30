@@ -1,3 +1,4 @@
+# app/core/email.py
 import httpx
 from app.config import settings
 from fastapi import HTTPException, status
@@ -27,6 +28,8 @@ async def send_brevo_email(to_email: str, subject: str, html_content: str):
             return response.json()
         except httpx.RequestError as e:
             logger.error(f"An error occurred while sending email to {to_email}: {e}")
+            # Optionally, don't raise HTTPException here if email failure shouldn't stop registration
+            # For now, we'll keep it for immediate feedback during development.
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to send email: {e}"
@@ -39,13 +42,14 @@ async def send_brevo_email(to_email: str, subject: str, html_content: str):
             )
 
 async def send_verification_email(to_email: str, recipient_name: str, verification_link: str):
-    subject = "Verify Your E-Wallet Account"
+    subject = "Verify Your E-Wallet Account - Action Required!"
     html_content = f"""
     <html>
     <body>
         <p>Hello {recipient_name},</p>
         <p>Thank you for registering with E-Wallet! To activate your account and start managing your finances, please click on the link below:</p>
-        <p><a href="{verification_link}">Verify Your Email Address</a></p>
+        <p><a href="{verification_link}"><strong>Verify Your Email Address</strong></a></p>
+        <p>This link is valid for 24 hours.</p>
         <p>If you did not register for this account, please ignore this email.</p>
         <p>Best regards,</p>
         <p>The E-Wallet Team</p>
@@ -54,7 +58,6 @@ async def send_verification_email(to_email: str, recipient_name: str, verificati
     """
     await send_brevo_email(to_email, subject, html_content)
 
-# You can add other email functions like:
 async def send_password_reset_email(to_email: str, recipient_name: str, reset_link: str):
     subject = "E-Wallet Password Reset Request"
     html_content = f"""
@@ -62,12 +65,13 @@ async def send_password_reset_email(to_email: str, recipient_name: str, reset_li
     <body>
         <p>Hello {recipient_name},</p>
         <p>We received a request to reset your password for your E-Wallet account. If you made this request, please click on the link below to reset your password:</p>
-        <p><a href="{reset_link}">Reset Your Password</a></p>
+        <p><a href="{reset_link}"><strong>Reset Your Password</strong></a></p>
+        <p>This link will expire in 60 minutes.</p>
         <p>If you did not request a password reset, please ignore this email.</p>
-        <p>This link will expire in [e.g., 1 hour].</p>
         <p>Best regards,</p>
         <p>The E-Wallet Team</p>
     </body>
     </html>
     """
     await send_brevo_email(to_email, subject, html_content)
+    
